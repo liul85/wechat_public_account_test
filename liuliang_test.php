@@ -34,16 +34,14 @@
           if($form_content == "tq")
           {
             $msgType = "text"; 
-            $contentStr = $this->getWeather();
-              //$resultStr = sprintf($textTpl, $fromUsername, $toUsername, time(), $msgType, $contentStr);
-            $resultStr = sprintf("<xml>
-            <ToUserName><![CDATA[%s]]></ToUserName>
-            <FromUserName><![CDATA[%s]]></FromUserName>
-            <CreateTime>%s</CreateTime>
-            <MsgType><![CDATA[%s]]></MsgType>
-            <Content><![CDATA[%s]]></Content>
-            <FuncFlag>0</FuncFlag>
-            </xml>",$fromUsername, $toUsername, time(), $msgType, $contentStr);
+            //get weather data from weather.com
+            $url = "http://m.weather.com.cn/data/101110101.html";
+            $output = file_get_contents($url);
+            $weather = json_decode($output, true);
+            $info = $weather['weatherinfo'];
+            $weather_result = "【".$info['city']."】".$info['date_y']." 天气实况: ".$info['weather1']."\n温度: ".$info['temp1']."\n".$info[index_d]."";
+            //response message
+            $resultStr = sprintf($textTpl, $fromUsername, $toUsername, time(), $msgType, $weather_result);
             echo $resultStr;
             exit;
           }
@@ -85,16 +83,6 @@
         echo "";
         exit;
       }
-    }
-
-    private function getWeather()
-    {
-      $url = "http://m.weather.com.cn/data/101110101.html";
-      $output = file_get_contents($url);
-      $weather = json_decode($output, true);
-      $info = $weather['weatherinfo'];
-      $weather_result = "【".$info['city']."】".$info['date_y']." 天气实况: ".$info['weather1']."\n温度: ".$info['temp1']."\n".$info[index_d]."";
-      return $weather_result;
     }
   }
 ?>
